@@ -13,9 +13,9 @@ import (
 func drawTurningSandCurve(img *image.RGBA64, points []Point, c color.RGBA64, sandCoef int) {
 	for index, point := range points {
 		if index+1 == len(points) {
-			AddToSandLine(img, point, points[0], c, sandCoef)
+			addToTurningSandLine(img, point, points[0], c, sandCoef)
 		} else {
-			AddToSandLine(img, point, points[index+1], c, sandCoef)
+			addToTurningSandLine(img, point, points[index+1], c, sandCoef)
 		}
 	}
 }
@@ -73,6 +73,11 @@ func addToTurningSandLine(img *image.RGBA64, p0, p1 Point, c color.RGBA64, sandC
 
 		p0.cartesianMove(nextXMove, nextYMove)
 
+		if param2 == 1 {
+			pr.x += nextXMove
+			pr.y += nextYMove
+		}
+
 		AddToDegressiveLine(img, p0.cartesian.x, p0.cartesian.y, pr.x, pr.y, c)
 
 		if p0.cartesian.x == p1.cartesian.x && p0.cartesian.y == p1.cartesian.y {
@@ -104,7 +109,7 @@ func TurningHazardousShape() {
 	c.B = c.B / uint16(cycles)
 
 	generator := tools.NewNumberGenerator(seed, 0, 6)
-	generatorPoints := tools.NewNumberGenerator(seed, 20, 50)
+	generatorPoints := tools.NewNumberGenerator(seed, 40, 70)
 	generatorPointRandomness := tools.NewNumberGenerator(seed, 0, 100)
 	radius := 40.0
 

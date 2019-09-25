@@ -73,25 +73,21 @@ func AddToLine(img *image.RGBA64, x0, y0, x1, y1 int, c color.RGBA64) {
 	err := dx - dy
 
 	for {
-		if img.At(x0, y0) != baseColor {
-			newC := img.RGBA64At(x0, y0)
+		newC := img.RGBA64At(x0, y0)
 
-			if maxValue-newC.R >= c.R {
-				newC.R = newC.R + c.R
-			}
-
-			if maxValue-newC.G >= c.G {
-				newC.G = newC.G + c.G
-			}
-
-			if maxValue-newC.B >= c.B {
-				newC.B = newC.B + c.B
-			}
-
-			img.Set(x0, y0, newC)
-		} else {
-			img.Set(x0, y0, c)
+		if maxValue-c.R >= newC.R {
+			newC.R = newC.R + c.R
 		}
+
+		if maxValue-c.G >= newC.G {
+			newC.G = newC.G + c.G
+		}
+
+		if maxValue-c.B >= newC.B {
+			newC.B = newC.B + c.B
+		}
+
+		img.SetRGBA64(x0, y0, newC)
 
 		if x0 == x1 && y0 == y1 {
 			break
@@ -145,27 +141,27 @@ func AddToDegressiveLine(img *image.RGBA64, x0, y0, x1, y1 int, c color.RGBA64) 
 			y0 += sy
 		}
 
-		if img.At(x0, y0) != baseColor {
-			currentDistance := distance(x0, y0, x1, y1)
+		currentDistance := distance(x0, y0, x1, y1)
 
-			newC := img.RGBA64At(x0, y0)
+		newC := img.RGBA64At(x0, y0)
 
-			if maxValue-newC.R >= c.R {
-				newC.R = newC.R + uint16(float64(c.R)*(totalDistance-currentDistance)/totalDistance)
-			}
+		rValue := uint16(float64(c.R) * (totalDistance - currentDistance) / totalDistance)
+		gValue := uint16(float64(c.G) * (totalDistance - currentDistance) / totalDistance)
+		bValue := uint16(float64(c.B) * (totalDistance - currentDistance) / totalDistance)
 
-			if maxValue-newC.G >= c.G {
-				newC.G = newC.G + uint16(float64(c.G)*(totalDistance-currentDistance)/totalDistance)
-			}
-
-			if maxValue-newC.B >= c.B {
-				newC.B = newC.B + uint16(float64(c.B)*(totalDistance-currentDistance)/totalDistance)
-			}
-
-			img.Set(x0, y0, newC)
-		} else {
-			img.Set(x0, y0, c)
+		if maxValue-rValue >= newC.R {
+			newC.R = newC.R + rValue
 		}
+
+		if maxValue-gValue >= newC.G {
+			newC.G = newC.G + gValue
+		}
+
+		if maxValue-bValue >= newC.B {
+			newC.B = newC.B + bValue
+		}
+
+		img.SetRGBA64(x0, y0, newC)
 
 		if x0 == x1 && y0 == y1 {
 			break

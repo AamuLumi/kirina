@@ -81,3 +81,5 @@ Run previous commands and replace `-bdl` by `-ibdl`, `-bdl2` by `-ibdl2` or `-bd
 <p align="center"><img align="center" src="examples/ths.png"/></p><br/>
 
 `go run main.go -ths --p1 <sand_int> --colors <colors_name>`
+
+You can add `--p2 1` to enable a "blur".

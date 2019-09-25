@@ -36,6 +36,7 @@ go run main.go
 - `green`
 - `rainbow`
 - `beach`
+- `synthwave`
 - `grey`
 
 ### Simple generators

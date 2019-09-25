@@ -86,6 +86,29 @@ func addToTurningSandLine(img *image.RGBA64, p0, p1 Point, c color.RGBA64, sandC
 	}
 }
 
+func createColor(i int) color.RGBA64 {
+	nbColors := cycles
+	nbAvailableColors := len(colors)
+
+	nbColorsByIndex := nbColors / nbAvailableColors
+	currentIndex := i * nbAvailableColors / nbColors
+	nextIndex := currentIndex + 1
+
+	if currentIndex == nbAvailableColors-1 {
+		nextIndex = 0
+	}
+
+	value := (i - (nbColorsByIndex * currentIndex)) * 100 / nbColorsByIndex
+
+	computedColor := tools.ColorMean(value, &colors[currentIndex], &colors[nextIndex])
+
+	computedColor.R /= uint16(cycles)
+	computedColor.G /= uint16(cycles)
+	computedColor.B /= uint16(cycles)
+
+	return computedColor
+}
+
 // TurningHazardousShape draws a turning shape
 func TurningHazardousShape() {
 	if param1 == -1 {
@@ -101,12 +124,6 @@ func TurningHazardousShape() {
 	if cycles < 0 {
 		cycles = 200
 	}
-
-	c := colors[0]
-
-	c.R = c.R / uint16(cycles)
-	c.G = c.G / uint16(cycles)
-	c.B = c.B / uint16(cycles)
 
 	generator := tools.NewNumberGenerator(seed, 0, 6)
 	generatorPoints := tools.NewNumberGenerator(seed, 40, 70)
@@ -145,7 +162,9 @@ func TurningHazardousShape() {
 			moveAwayFromCenterWithCoef(bounds.Max.X/2, bounds.Max.Y/2, &shape[index], 1, &generatorPointRandomness, &generator)
 		}
 
-		drawTurningSandCurve(img, shape, c, param1)
+		color := createColor(i)
+
+		drawTurningSandCurve(img, shape, color, param1)
 
 		if updateImage != nil {
 			updateImage(img)

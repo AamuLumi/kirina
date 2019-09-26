@@ -3,6 +3,8 @@ package generators
 import (
 	"image"
 	"image/color"
+
+	"../tools"
 )
 
 var baseColor color.RGBA64
@@ -13,10 +15,19 @@ var param1 = -1
 var param2 = -1
 var cycles = -1
 var colors []color.RGBA64
+var isLightBackground = false
 
 // SetBaseColor sets the base color of image
 func SetBaseColor(color color.RGBA64) {
 	baseColor = color
+
+	if color.R > 0x8000 && color.G > 0x8000 && color.B > 0x8000 {
+		isLightBackground = true
+
+		if len(colors) > 0 {
+			colors = tools.ColorsInversion(colors)
+		}
+	}
 }
 
 // SetNumberSeed sets the seed for number generator
@@ -47,6 +58,10 @@ func SetParam2(p int) {
 // SetParamColors sets the colors parameter for generator
 func SetParamColors(c []color.RGBA64) {
 	colors = c
+
+	if isLightBackground {
+		colors = tools.ColorsInversion(c)
+	}
 }
 
 // SetCycles sets number of cycles of the generator to do

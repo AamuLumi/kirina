@@ -42,6 +42,34 @@ func ColorMean(percentage int, min, max *color.RGBA64) color.RGBA64 {
 	return computeMeanOf(percentage, min, max)
 }
 
+// ColorInversion inverse a color
+func ColorInversion(c color.RGBA64) color.RGBA64 {
+	return color.RGBA64{
+		R: 0xFFFF - c.R,
+		G: 0xFFFF - c.G,
+		B: 0xFFFF - c.B,
+		A: 0xFFFF,
+	}
+}
+
+// ColorsInversion inverse a array of colors
+func ColorsInversion(colors []color.RGBA64) []color.RGBA64 {
+	var result []color.RGBA64
+
+	for _, c := range colors {
+		result = append(result,
+			color.RGBA64{
+				R: 0xFFFF - c.R,
+				G: 0xFFFF - c.G,
+				B: 0xFFFF - c.B,
+				A: 0xFFFF,
+			},
+		)
+	}
+
+	return result
+}
+
 // NextColor returns the next color of the generator
 func (g *ColorGenerator) NextColor() color.RGBA64 {
 	maxColorToGet := g.currentValue / 256

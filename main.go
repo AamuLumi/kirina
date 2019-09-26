@@ -134,7 +134,7 @@ func applyArgWithValue(arg string, value string) {
 	case "--seed":
 		setSeed(valueToInt(value))
 	case "--bg":
-		setBackgroundColor(value) // Not currently used
+		setBackgroundColor(value)
 	case "--colors":
 		setColors(value)
 	case "--p1":

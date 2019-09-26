@@ -15,6 +15,7 @@ go run main.go
 	--width <int> : width of the output
 	--height <int> : height of the output
 	--seed <int> : number of the seed to use
+	--bg <string> : background color to use ("black" by default, "white" accepted)
 	-v : enable OpenGL visualization of image building (slow computation)
 ```
 

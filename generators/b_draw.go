@@ -6,6 +6,7 @@ import (
 )
 
 var maxValue = uint16(0xFFFF)
+var minValue = uint16(0x0000)
 
 // Line draws line by Bresenham's algorithm.
 func Line(img *image.RGBA64, x0, y0, x1, y1 int, c color.RGBA64) {
@@ -75,16 +76,30 @@ func AddToLine(img *image.RGBA64, x0, y0, x1, y1 int, c color.RGBA64) {
 	for {
 		newC := img.RGBA64At(x0, y0)
 
-		if maxValue-c.R >= newC.R {
-			newC.R = newC.R + c.R
-		}
+		if isLightBackground {
+			if c.R <= newC.R {
+				newC.R -= c.R
+			}
 
-		if maxValue-c.G >= newC.G {
-			newC.G = newC.G + c.G
-		}
+			if c.G <= newC.G {
+				newC.G -= c.G
+			}
 
-		if maxValue-c.B >= newC.B {
-			newC.B = newC.B + c.B
+			if c.B <= newC.B {
+				newC.B -= c.B
+			}
+		} else {
+			if maxValue-c.R >= newC.R {
+				newC.R += c.R
+			}
+
+			if maxValue-c.G >= newC.G {
+				newC.G += c.G
+			}
+
+			if maxValue-c.B >= newC.B {
+				newC.B += c.B
+			}
 		}
 
 		img.SetRGBA64(x0, y0, newC)
@@ -141,24 +156,37 @@ func AddToDegressiveLine(img *image.RGBA64, x0, y0, x1, y1 int, c color.RGBA64) 
 			y0 += sy
 		}
 
-		currentDistance := distance(x0, y0, x1, y1)
-
 		newC := img.RGBA64At(x0, y0)
+		currentDistance := distance(x0, y0, x1, y1)
 
 		rValue := uint16(float64(c.R) * (totalDistance - currentDistance) / totalDistance)
 		gValue := uint16(float64(c.G) * (totalDistance - currentDistance) / totalDistance)
 		bValue := uint16(float64(c.B) * (totalDistance - currentDistance) / totalDistance)
 
-		if maxValue-rValue >= newC.R {
-			newC.R = newC.R + rValue
-		}
+		if isLightBackground {
+			if rValue <= newC.R {
+				newC.R -= rValue
+			}
 
-		if maxValue-gValue >= newC.G {
-			newC.G = newC.G + gValue
-		}
+			if gValue <= newC.G {
+				newC.G -= gValue
+			}
 
-		if maxValue-bValue >= newC.B {
-			newC.B = newC.B + bValue
+			if bValue <= newC.B {
+				newC.B -= bValue
+			}
+		} else {
+			if maxValue-rValue >= newC.R {
+				newC.R += rValue
+			}
+
+			if maxValue-gValue >= newC.G {
+				newC.G += gValue
+			}
+
+			if maxValue-bValue >= newC.B {
+				newC.B += bValue
+			}
 		}
 
 		img.SetRGBA64(x0, y0, newC)

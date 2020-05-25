@@ -10,7 +10,7 @@ import (
 	"../tools"
 )
 
-func tunnelCreateColor(i int) color.RGBA64 {
+func devCreateColor(i int) color.RGBA64 {
 	nbColors := cycles
 	nbAvailableColors := len(colors)
 
@@ -33,8 +33,8 @@ func tunnelCreateColor(i int) color.RGBA64 {
 	return computedColor
 }
 
-// AddToSandTunnelLine draws line by Bresenham's algorithm.
-func AddToSandTunnelLine(img *image.RGBA64, p0, p1 Point, c color.RGBA64, sandCoef int) {
+// AddToSandSpiralLine draws line by Bresenham's algorithm.
+func AddToSandSpiralLine(img *image.RGBA64, p0, p1 Point, c color.RGBA64, sandCoef int) {
 	p0or := Point{
 		cartesian: CartesianPoint{
 			x: p0.cartesian.x,
@@ -49,45 +49,24 @@ func AddToSandTunnelLine(img *image.RGBA64, p0, p1 Point, c color.RGBA64, sandCo
 			x: p1.cartesian.x,
 			y: p1.cartesian.y,
 		},
-		polar:  p1.cartesian.toPolar(p1.center),
-		center: p1.center,
+		polar:  p1.cartesian.toPolar(p0.center),
+		center: p0.cartesian,
 	}
 
-	dx := p1.cartesian.x - p0.cartesian.x
+	p0or.polarMove(0, -float64(sandCoef))
+	p1or.polarMove(0.4, 32)
+
+	dx := p0.cartesian.x - p0or.cartesian.x
 	if dx < 0 {
 		dx = -dx
 	}
 
-	dy := p1.cartesian.y - p0.cartesian.y
+	dy := p0.cartesian.y - p0or.cartesian.y
 	if dy < 0 {
 		dy = -dy
 	}
 
 	var sx, sy int
-	if p0.cartesian.x < p1.cartesian.x {
-		sx = 1
-	} else {
-		sx = -1
-	}
-
-	if p0.cartesian.y < p1.cartesian.y {
-		sy = 1
-	} else {
-		sy = -1
-	}
-
-	p0or.polarMove(0.2, -float64(sandCoef))
-	p1or.polarMove(0.2, -float64(sandCoef))
-
-	dx = p0.cartesian.x - p0or.cartesian.x
-	if dx < 0 {
-		dx = -dx
-	}
-
-	dy = p0.cartesian.y - p0or.cartesian.y
-	if dy < 0 {
-		dy = -dy
-	}
 
 	if p0or.cartesian.x < p0.cartesian.x {
 		sx = 1
@@ -104,7 +83,7 @@ func AddToSandTunnelLine(img *image.RGBA64, p0, p1 Point, c color.RGBA64, sandCo
 	err := dx - dy
 
 	for {
-		AddToWuLine(img, float64(p0or.cartesian.x), float64(p0or.cartesian.y), float64(p1or.cartesian.x), float64(p1or.cartesian.y), 1.0, c)
+		AddToWuLine(img, float64(p0or.cartesian.x), float64(p0or.cartesian.y), float64(p1or.cartesian.x), float64(p1or.cartesian.y), 5.0, c)
 
 		if p0.cartesian.x == p0or.cartesian.x && p0.cartesian.y == p0or.cartesian.y {
 			break
@@ -129,34 +108,46 @@ func AddToSandTunnelLine(img *image.RGBA64, p0, p1 Point, c color.RGBA64, sandCo
 	}
 }
 
-// DrawSandTunnelCurve draw a diamond around a center, with a bigger size than normal
-func DrawSandTunnelCurve(img *image.RGBA64, points []Point, c color.RGBA64, sandCoef int) {
+// DrawSandSpiralCurve draw a diamond around a center, with a bigger size than normal
+func DrawSandSpiralCurve(img *image.RGBA64, points []Point, c color.RGBA64, sandCoef int) {
 	for index, point := range points {
 		if index+1 == len(points) {
-			AddToSandTunnelLine(img, point, points[0], c, sandCoef)
+			AddToSandSpiralLine(img, point, points[0], c, sandCoef)
 		} else {
-			AddToSandTunnelLine(img, point, points[index+1], c, sandCoef)
+			AddToSandSpiralLine(img, point, points[index+1], c, sandCoef)
 		}
 	}
 }
 
-// Tunnel draws a turning shape
-func Tunnel() {
+// Spiral draws a turning shape
+func Spiral() {
 	if param1 == -1 {
-		fmt.Println("p1 must be set for THS")
+		fmt.Println("p1 must be set for Spiral")
 		os.Exit(-1)
 	}
 
 	if colors == nil {
-		fmt.Println("colors must be set for THS")
+		fmt.Println("colors must be set for Spiral")
 		os.Exit(-1)
+	}
+
+	maximumSpaceMove := 6
+
+	if param2 > 0 {
+		maximumSpaceMove = param2
+	}
+
+	moveAngleInRadians := 0.4
+
+	if param3 != -1 {
+		moveAngleInRadians = float64(param3) * 2 * math.Pi / 360.
 	}
 
 	if cycles < 0 {
 		cycles = 200
 	}
 
-	generator := tools.NewNumberGenerator(seed, 0, 6)
+	generator := tools.NewNumberGenerator(seed, 0, maximumSpaceMove)
 	generatorPoints := tools.NewNumberGenerator(seed, 12, 32)
 	generatorPointRandomness := tools.NewNumberGenerator(seed, 0, 100)
 	radius := 40.0
@@ -193,9 +184,13 @@ func Tunnel() {
 			moveAwayFromCenterWithCoef(bounds.Max.X/2, bounds.Max.Y/2, &shape[index], 1, &generatorPointRandomness, &generator)
 		}
 
-		color := tunnelCreateColor(i)
+		color := devCreateColor(i)
 
-		DrawSandTunnelCurve(img, shape, color, param1)
+		DrawSandSpiralCurve(img, shape, color, param1)
+
+		for index := range shape {
+			shape[index].polarMove(moveAngleInRadians, 0)
+		}
 
 		if updateImage != nil {
 			updateImage(img)

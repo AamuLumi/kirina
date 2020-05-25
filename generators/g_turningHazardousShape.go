@@ -86,7 +86,7 @@ func addToTurningSandLine(img *image.RGBA64, p0, p1 Point, c color.RGBA64, sandC
 	}
 }
 
-func createColor(i int) color.RGBA64 {
+func thsCreateColor(i int) color.RGBA64 {
 	nbColors := cycles
 	nbAvailableColors := len(colors)
 
@@ -162,7 +162,7 @@ func TurningHazardousShape() {
 			moveAwayFromCenterWithCoef(bounds.Max.X/2, bounds.Max.Y/2, &shape[index], 1, &generatorPointRandomness, &generator)
 		}
 
-		color := createColor(i)
+		color := thsCreateColor(i)
 
 		drawTurningSandCurve(img, shape, color, param1)
 

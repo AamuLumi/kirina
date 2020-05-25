@@ -13,6 +13,7 @@ var img *image.RGBA64
 var updateImage func(*image.RGBA64)
 var param1 = -1
 var param2 = -1
+var param3 = -1
 var cycles = -1
 var colors []color.RGBA64
 var isLightBackground = false
@@ -53,6 +54,11 @@ func SetParam1(p int) {
 // SetParam2 sets the second parameter for generator
 func SetParam2(p int) {
 	param2 = p
+}
+
+// SetParam3 sets the third parameter for generator
+func SetParam3(p int) {
+	param3 = p
 }
 
 // SetParamColors sets the colors parameter for generator

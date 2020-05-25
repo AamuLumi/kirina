@@ -3,6 +3,7 @@ package generators
 import (
 	"image"
 	"image/color"
+	"math"
 )
 
 var maxValue = uint16(0xFFFF)
@@ -46,6 +47,135 @@ func Line(img *image.RGBA64, x0, y0, x1, y1 int, c color.RGBA64) {
 			err += dx
 			y0 += sy
 		}
+	}
+}
+
+func ipart(x float64) float64 {
+	return math.Floor(x)
+}
+
+func round(x float64) float64 {
+	return ipart(x + .5)
+}
+
+func fpart(x float64) float64 {
+	return x - ipart(x)
+}
+
+func rfpart(x float64) float64 {
+	return 1 - fpart(x)
+}
+
+// AddToWuLine draws line with Xialang Wu algorithm
+func AddToWuLine(img *image.RGBA64, x1, y1, x2, y2 float64, w int, col color.RGBA64) {
+	dx := x2 - x1
+	dy := y2 - y1
+	ax := dx
+	if ax < 0 {
+		ax = -ax
+	}
+	ay := dy
+	if ay < 0 {
+		ay = -ay
+	}
+
+	var plot func(int, int, float64)
+
+	if ax < ay {
+		x1, y1 = y1, x1
+		x2, y2 = y2, x2
+		dx, dy = dy, dx
+		plot = func(x, y int, c float64) {
+			newC := img.RGBA64At(y, x)
+
+			if isLightBackground {
+				if col.R <= newC.R {
+					newC.R -= uint16(float64(col.R) * c)
+				}
+
+				if col.G <= newC.G {
+					newC.G -= uint16(float64(col.G) * c)
+				}
+
+				if col.B <= newC.B {
+					newC.B -= uint16(float64(col.B) * c)
+				}
+			} else {
+				if maxValue-col.R >= newC.R {
+					newC.R += uint16(float64(col.R) * c)
+				}
+
+				if maxValue-col.G >= newC.G {
+					newC.G += uint16(float64(col.G) * c)
+				}
+
+				if maxValue-col.B >= newC.B {
+					newC.B += uint16(float64(col.B) * c)
+				}
+			}
+
+			img.SetRGBA64(y, x, newC)
+		}
+	} else {
+		plot = func(x, y int, c float64) {
+			newC := img.RGBA64At(x, y)
+
+			if isLightBackground {
+				if col.R <= newC.R {
+					newC.R -= uint16(float64(col.R) * c)
+				}
+
+				if col.G <= newC.G {
+					newC.G -= uint16(float64(col.G) * c)
+				}
+
+				if col.B <= newC.B {
+					newC.B -= uint16(float64(col.B) * c)
+				}
+			} else {
+				if maxValue-col.R >= newC.R {
+					newC.R += uint16(float64(col.R) * c)
+				}
+
+				if maxValue-col.G >= newC.G {
+					newC.G += uint16(float64(col.G) * c)
+				}
+
+				if maxValue-col.B >= newC.B {
+					newC.B += uint16(float64(col.B) * c)
+				}
+			}
+
+			img.SetRGBA64(x, y, newC)
+		}
+	}
+	if x2 < x1 {
+		x1, x2 = x2, x1
+		y1, y2 = y2, y1
+	}
+	gradient := dy / dx
+
+	xend := round(x1)
+	yend := y1 + gradient*(xend-x1)
+	xgap := rfpart(x1 + .5)
+	xpxl1 := int(xend)
+	ypxl1 := int(ipart(yend))
+	plot(xpxl1, ypxl1, rfpart(yend)*xgap)
+	plot(xpxl1, ypxl1+1, fpart(yend)*xgap)
+	intery := yend + gradient
+
+	xend = round(x2)
+	yend = y2 + gradient*(xend-x2)
+	xgap = fpart(x2 + 0.5)
+	xpxl2 := int(xend)
+	ypxl2 := int(ipart(yend))
+	plot(xpxl2, ypxl2, rfpart(yend)*xgap)
+	plot(xpxl2, ypxl2+1, fpart(yend)*xgap)
+
+	for x := xpxl1 + 1; x <= xpxl2-1; x++ {
+		plot(x, int(ipart(intery)), rfpart(intery))
+		plot(x, int(ipart(intery))+1, fpart(intery))
+		intery = intery + gradient
 	}
 }
 
@@ -253,13 +383,6 @@ func AddToSandLine(img *image.RGBA64, p0, p1 AngularPoint, c color.RGBA64, sandC
 
 // AddToSandLine draws line by Bresenham's algorithm.
 func AddToSandLine(img *image.RGBA64, p0, p1 Point, c color.RGBA64, sandCoef int) {
-	pt := PolarPoint{
-		angle:  p0.polar.angle + p1.polar.angle/2,
-		radius: p0.polar.radius + float64(sandCoef),
-	}
-
-	pr := pt.toCartesian(p0.center)
-
 	// implemented straight from WP pseudocode
 	dx := p1.cartesian.x - p0.cartesian.x
 	if dx < 0 {
@@ -296,7 +419,6 @@ func AddToSandLine(img *image.RGBA64, p0, p1 Point, c color.RGBA64, sandCoef int
 			err -= dy
 			nextXMove = sx
 		}
-
 		if e2 < dx {
 			err += dx
 			nextYMove = sy
@@ -304,7 +426,19 @@ func AddToSandLine(img *image.RGBA64, p0, p1 Point, c color.RGBA64, sandCoef int
 
 		p0.cartesianMove(nextXMove, nextYMove)
 
-		AddToDegressiveLine(img, p0.cartesian.x, p0.cartesian.y, pr.x, pr.y, c)
+		pt := PolarPoint{
+			angle:  p0.polar.angle,
+			radius: p0.polar.radius + float64(sandCoef),
+		}
+
+		pr := pt.toCartesian(p0.center)
+
+		//px := math.Cos(pt.angle)*(pt.radius) + float64(p0.center.x)
+		//py := math.Sin(pt.angle)*(pt.radius) + float64(p0.center.y)
+
+		AddToLine(img, p0.cartesian.x, p0.cartesian.y, pr.x, pr.y, c)
+
+		//AddToWuLine(img, float64(p0.cartesian.x), float64(p0.cartesian.y), px, py, 1.0, c)
 
 		if p0.cartesian.x == p1.cartesian.x && p0.cartesian.y == p1.cartesian.y {
 			break

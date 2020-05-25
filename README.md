@@ -39,6 +39,7 @@ go run main.go
 - `beach`
 - `synthwave`
 - `grey`
+- `space`
 
 ### Simple generators
 
@@ -85,3 +86,11 @@ Run previous commands and replace `-bdl` by `-ibdl`, `-bdl2` by `-ibdl2` or `-bd
 `go run main.go -ths --p1 <sand_int> --colors <colors_name>`
 
 You can add `--p2 1` to enable a "blur".
+
+#### Spiral (spiral)
+
+<p align="center"><img align="center" src="examples/spiral.png"/></p><br/>
+
+`go run main.go -spiral --p1 <sand_int> --colors <colors_name>`
+
+You can add `--p2 <int>` to change the maximum space to points added between cycle, and `--p3 <int>` to change the turn angle in degrees.

@@ -141,6 +141,8 @@ func applyArgWithValue(arg string, value string) {
 		generators.SetParam1(valueToInt(value))
 	case "--p2":
 		generators.SetParam2(valueToInt(value))
+	case "--p3":
+		generators.SetParam3(valueToInt(value))
 	case "--cycles":
 		generators.SetCycles(valueToInt(value))
 	}
@@ -168,6 +170,10 @@ func applyArg(arg string) {
 		setGenerator(generators.QuadSymInversedSurroundedDiagonalLine)
 	case "-ths":
 		setGenerator(generators.TurningHazardousShape)
+	case "-spiral":
+		setGenerator(generators.Spiral)
+		//case "-dev":
+		//	setGenerator(generators.Dev)
 	}
 }
 
@@ -187,10 +193,10 @@ func applyArgs(args []string) {
 func main() {
 	args := os.Args[1:]
 
-	applyArgs(args)
-
 	rand.Seed(time.Now().UTC().UnixNano())
 	seed = rand.Intn(math.MaxInt16)
+
+	applyArgs(args)
 
 	log.Println("Seed :", seed)
 

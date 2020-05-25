@@ -70,6 +70,6 @@ func (p *CartesianPoint) toPolar(center CartesianPoint) PolarPoint {
 
 	return PolarPoint{
 		angle:  c,
-		radius: distance(p.x, p.y, center.x, center.y),
+		radius: dist,
 	}
 }

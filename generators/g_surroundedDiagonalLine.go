@@ -4,7 +4,7 @@ import (
 	"image"
 	"image/color"
 
-	"../tools"
+	"kirina/tools"
 )
 
 func additionalDraw(img *image.RGBA64, prevX, prevY, x, y, coef int, color *color.RGBA64) {

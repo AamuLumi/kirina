@@ -4,7 +4,7 @@ import (
 	"image"
 	"image/color"
 
-	"../tools"
+	"kirina/tools"
 )
 
 var baseColor color.RGBA64

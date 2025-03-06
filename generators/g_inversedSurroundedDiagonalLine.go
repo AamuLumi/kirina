@@ -6,7 +6,7 @@ import (
 	"image/color"
 	"os"
 
-	"../tools"
+	"kirina/tools"
 )
 
 func inversedSurroundedDiagonalLineAdditionalDraw(img *image.RGBA64, prevX, prevY, x, y, coef int, color *color.RGBA64) {

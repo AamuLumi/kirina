@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"../tools"
+	"kirina/tools"
 )
 
 // BasicPointPerPoint draws an random image point per point

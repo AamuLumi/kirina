@@ -7,7 +7,7 @@ import (
 	"math"
 	"os"
 
-	"../tools"
+	"kirina/tools"
 )
 
 func tunnelCreateColor(i int) color.RGBA64 {

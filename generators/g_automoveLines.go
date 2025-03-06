@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"image/color"
 
-	"../tools"
+	"kirina/tools"
 )
 
 func computeLines(nbLines int) [][]int {

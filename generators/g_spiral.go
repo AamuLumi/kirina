@@ -7,7 +7,7 @@ import (
 	"math"
 	"os"
 
-	"../tools"
+	"kirina/tools"
 )
 
 func devCreateColor(i int) color.RGBA64 {

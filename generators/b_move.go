@@ -1,7 +1,7 @@
 package generators
 
 import (
-	"../tools"
+	"kirina/tools"
 )
 
 func basic4MoveWithCoef(x, y *int, coef int, g *tools.NumberGenerator) {

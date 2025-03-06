@@ -3,7 +3,7 @@ package generators
 import (
 	"image/color"
 
-	"../tools"
+	"kirina/tools"
 )
 
 // Subdivision divide the image

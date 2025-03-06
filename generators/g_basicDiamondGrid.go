@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"../tools"
+	"kirina/tools"
 )
 
 // BasicDiamondGrid draws a diamond grid

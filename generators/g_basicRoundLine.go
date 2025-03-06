@@ -6,7 +6,7 @@ import (
 	"image/color"
 	"os"
 
-	"../tools"
+	"kirina/tools"
 )
 
 var basicRoundLineAdditionalDraw func(*image.RGBA64, int, int, int, int, int, *color.RGBA64)

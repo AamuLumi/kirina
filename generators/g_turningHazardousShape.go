@@ -7,7 +7,7 @@ import (
 	"math"
 	"os"
 
-	"../tools"
+	"kirina/tools"
 )
 
 func drawTurningSandCurve(img *image.RGBA64, points []Point, c color.RGBA64, sandCoef int) {
